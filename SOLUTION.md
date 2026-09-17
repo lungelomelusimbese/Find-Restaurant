@@ -13,14 +13,14 @@ I would adopt a **feature-layered modularization** strategy to enable parallel d
 ## 2. Navigation, State, and Data Boundaries
 Clear boundaries prevent squads from interfering with each other's work.
 
-*   **Navigation Contracts**: Instead of hardcoded routes, we would use a contract-based approach (e.g., `:core:navigation`). Feature A requests navigation to Feature B via an interface, and the `:app` module (the orchestrator) provides the implementation.
-*   **State Isolation**: Each feature manages its own `UiState`. We would favor **MVI (Model-View-Intent)** for complex features to ensure state predictability and easier debugging in multi-squad environments.
-*   **Data Boundaries**: We would implement a **Single Source of Truth (SSOT)** using the Room database. If the "Favorites Squad" updates a status, the "Browse Squad" sees it immediately because both observe the same local database stream.
+*   **Navigation Contracts**: Instead of hardcoded routes, I would use a contract-based approach (e.g., `:core:navigation`). Feature A requests navigation to Feature B via an interface, and the `:app` module (the orchestrator) provides the implementation.
+*   **State Isolation**: Each feature manages its own `UiState`. I would favor **MVI (Model-View-Intent)** for complex features to ensure state predictability and easier debugging in multi-squad environments.
+*   **Data Boundaries**: I would implement a **Single Source of Truth (SSOT)** using the Room database. If the "Favorites Squad" updates a status, the "Browse Squad" sees it immediately because both observe the same local database stream.
 
 ## 3. Testing Strategy
 A multi-layered testing approach is essential for large teams:
 
-*   **Unit Tests**: Mandatory for every Use Case and ViewModel. We would use **Turbine** for testing Flow emissions and **MockK** for repository mocking.
+*   **Unit Tests**: Mandatory for every Use Case and ViewModel. I would use **Turbine** for testing Flow emissions and **MockK** for repository mocking.
 *   **Integration Tests**: Use **Hilt/Koin** test modules to verify the interaction between the Repository and Room/Retrofit.
 
 ## 4. UI Performance for Large Lists
@@ -46,7 +46,7 @@ Choosing a tech stack is always a balance between development speed, performance
 
 *   Selected: Koin
 *   Trade-off:
-    * Pros: We chose Koin for its simplicity and speed. It doesn't rely on code generation (KSP/KAPT), which kept our build times fast during the prototyping phase. Its DSL is very readable and integrates naturally with Jetpack Compose.
+    * Pros: I chose Koin for its simplicity and speed. It doesn't rely on code generation (KSP/KAPT), which kept our build times fast during the prototyping phase. Its DSL is very readable and integrates naturally with Jetpack Compose.
     * Cons: Unlike Hilt, Koin resolves dependencies at runtime. This means if a dependency is missing, the app will crash when that screen opens, rather than failing at compile time.
     * Decision: For this project, the reduced boilerplate and faster development cycle outweighed the strict compile-time safety of Hilt.
 
@@ -55,25 +55,25 @@ Choosing a tech stack is always a balance between development speed, performance
 
 * Selected: Both (Hybrid approach)
 * Trade-off:
-  * DataStore (Preferences): We used this for favorite restaurant IDs because it's lightweight and doesn't require a schema. It's ideal for simple user preferences.
-  * Room: We used this for the 200-restaurant cache because it handles large, structured datasets and complex queries (like searching name/category) much more efficiently.
-  * Decision: While we could have stored everything in Room, using DataStore for favorites demonstrates a clean separation between cached domain data (Room) and user-specific preferences (DataStore).
+  * DataStore (Preferences): I used this for favorite restaurant IDs because it's lightweight and doesn't require a schema. It's ideal for simple user preferences.
+  * Room: I used this for the 200-restaurant cache because it handles large, structured datasets and complex queries (like searching name/category) much more efficiently.
+  * Decision: While I could have stored everything in Room, using DataStore for favorites demonstrates a clean separation between cached domain data (Room) and user-specific preferences (DataStore).
 
 ## 3. Networking: Retrofit vs. Ktor
 
 * Selected: Retrofit
 * Trade-off:
   * Pros: Retrofit is the industry standard. Its annotation-based approach is highly declarative, and the ecosystem of converters (Gson) is extremely mature.
-  * Cons: Retrofit is a Java-first library. Ktor would have been a better choice if we were planning to transition the project to Kotlin Multiplatform (KMP) in the future.
+  * Cons: Retrofit is a Java-first library. Ktor would have been a better choice if I were planning to transition the project to Kotlin Multiplatform (KMP) in the future.
   * Decision: Given the Android-centric requirements, Retrofit provided the most robust and familiar platform.
 
 ## 4. Architecture: MVVM + Use Cases vs. Simple MVVM
 
 * Selected: Use Cases (Domain Layer)
 * Trade-off:
-  * Pros: Adding Use Cases ensures that Business Logic is decoupled from the UI. If we want to change how "Open Now" is calculated (e.g., adding holiday hours), we only change one class, and both the BrowseScreen and SearchScreen benefit.
+  * Pros: Adding Use Cases ensures that Business Logic is decoupled from the UI. If I want to change how "Open Now" is calculated (e.g., adding holiday hours), I only change one class, and both the BrowseScreen and SearchScreen benefit.
   * Cons: It introduces "Class Bloat." For very simple tasks (like just getting a list), it feels like extra boilerplate.
-  * Decision: We prioritized Scalability. Use Cases make it much easier for different squads to work on the same data without duplicating logic.
+  * Decision: I prioritized Scalability. Use Cases make it much easier for different squads to work on the same data without duplicating logic.
 
 ## 5. Reactive Streams: Flow vs. LiveData
 
@@ -81,4 +81,4 @@ Choosing a tech stack is always a balance between development speed, performance
 * Trade-off:
   * Pros: Flow is built into Kotlin and is much more powerful than LiveData. It supports complex operators (like combine used for merging Room + DataStore) and handles backpressure elegantly.
   * Cons: Requires careful lifecycle management in the UI (e.g., using collectAsStateWithLifecycle) to avoid collecting data while the app is in the background.
-  * Decision: Since we are using Jetpack Compose, Flow is the modern and recommended standard for state management.
+  * Decision: Since I are using Jetpack Compose, Flow is the modern and recommended standard for state management.
